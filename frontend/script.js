@@ -2,7 +2,8 @@ const messageInput = document.getElementById("send-message");
 const sendBtn = document.getElementById("send");
 const displayMessages = document.getElementById("display-messages");
 
-const backendURL = "http://localhost:3000/messages";
+const backendURL =
+  "https://fatmaevin-chat-app-backend.hosting.codeyourfuture.io";
 
 async function getMessages() {
   try {
