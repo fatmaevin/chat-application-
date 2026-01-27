@@ -3,7 +3,7 @@ const sendBtn = document.getElementById("send");
 const displayMessages = document.getElementById("display-messages");
 
 const backendURL =
-  "https://fatmaevin-chat-app-backend.hosting.codeyourfuture.io";
+  "https://fatmaevin-chat-app-backend.hosting.codeyourfuture.io/messages";
 
 async function getMessages() {
   try {
