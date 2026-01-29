@@ -8,9 +8,25 @@ app.use(cors());
 app.use(express.json());
 
 const messages = [];
+const waitingResponse = [];
 
 app.get("/messages", (req, res) => {
-  res.json(messages);
+  const since = Number(req.query.since);
+  let lastMessages;
+
+  if (!since) {
+    lastMessages = messages;
+  } else {
+    lastMessages = messages.filter((msg) => msg.timestamp > since);
+  }
+
+  if (lastMessages.length > 0) {
+    res.json(lastMessages);
+  } else {
+    waitingResponse.push((newMessages) => {
+      res.json(newMessages);
+    });
+  }
 });
 
 app.post("/messages", (req, res) => {
@@ -23,6 +39,10 @@ app.post("/messages", (req, res) => {
     timestamp: Date.now(),
   };
   messages.push(newMessage);
+  while (waitingResponse.length > 0) {
+    const callback = waitingResponse.pop();
+    callback([newMessage]); 
+  }
 
   res.status(201).json(newMessage);
 });
