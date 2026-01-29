@@ -5,22 +5,44 @@ const displayMessages = document.getElementById("display-messages");
 const backendURL =
   "https://fatmaevin-chat-app-backend.hosting.codeyourfuture.io/messages";
 
-async function getMessages() {
+const state = {
+  messages: [],
+};
+
+function renderMessages() {
+  displayMessages.innerHTML = "";
+  state.messages.forEach((msg) => {
+    const p = document.createElement("p");
+    p.textContent = msg.text;
+    displayMessages.appendChild(p);
+  });
+}
+
+async function startLongPolling() {
   try {
-    const response = await fetch(backendURL);
-    if (!response.ok) {
-      throw new Error(`Response status: ${response.status}`);
+    let lastMessage;
+    if (state.messages.length > 0) {
+      lastMessage = state.messages[state.messages.length - 1].timestamp;
+    } else {
+      lastMessage = null;
     }
-    const messages = await response.json();
-    displayMessages.innerHTML = "";
-    messages.forEach((msg) => {
-      const p = document.createElement("p");
-      p.textContent = msg.text;
-      displayMessages.appendChild(p);
-    });
+    let query = "";
+    if (lastMessage) {
+      query = `?since=${lastMessage}`;
+    }
+    const response = await fetch(`${backendURL}${query}`);
+    if (!response.ok) {
+      throw new Error(`response status:${response.status}`);
+    }
+    const newMessages = await response.json();
+    if (newMessages.length > 0) {
+      state.messages.push(...newMessages);
+      renderMessages();
+    }
   } catch (error) {
     console.error("Error fetching messages:", error);
   }
+  startLongPolling();
 }
 
 async function sendMessage() {
@@ -42,11 +64,10 @@ async function sendMessage() {
       }
 
       messageInput.value = "";
-      getMessages();
     } catch (error) {
       console.error("Error sending message:", error);
     }
   });
 }
-getMessages();
+startLongPolling();
 sendMessage();
