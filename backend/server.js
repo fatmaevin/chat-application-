@@ -30,12 +30,13 @@ app.get("/messages", (req, res) => {
 });
 
 app.post("/messages", (req, res) => {
-  const text = req.body.text;
-  if (!text) {
-    return res.status(400).json({ error: "Text is required" });
+  const {text,username} = req.body;
+  if (!text || !username) {
+    return res.status(400).json({ error: "Text and username are required" });
   }
   const newMessage = {
     text,
+    username,
     timestamp: Date.now(),
   };
   messages.push(newMessage);
