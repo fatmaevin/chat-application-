@@ -1,6 +1,7 @@
 const messageInput = document.getElementById("send-message");
 const sendBtn = document.getElementById("send");
 const displayMessages = document.getElementById("display-messages");
+const username = document.getElementById("user-name");
 
 const backendURL =
   "https://fatmaevin-chat-app-backend.hosting.codeyourfuture.io/messages";
@@ -13,7 +14,7 @@ function renderMessages() {
   displayMessages.innerHTML = "";
   state.messages.forEach((msg) => {
     const p = document.createElement("p");
-    p.textContent = msg.text;
+    p.textContent = `${msg.username}:${msg.text}`;
     displayMessages.appendChild(p);
   });
 }
@@ -48,7 +49,8 @@ async function startLongPolling() {
 async function sendMessage() {
   sendBtn.addEventListener("click", async () => {
     const msg = messageInput.value.trim();
-    if (!msg) return;
+    const user = username.value.trim();
+    if (!msg || !user) return;
 
     try {
       const response = await fetch(backendURL, {
@@ -56,7 +58,7 @@ async function sendMessage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ text: msg }),
+        body: JSON.stringify({ text: msg, username: user }),
       });
 
       if (!response.ok) {
@@ -64,6 +66,7 @@ async function sendMessage() {
       }
 
       messageInput.value = "";
+      username.value = "";
     } catch (error) {
       console.error("Error sending message:", error);
     }
