@@ -28,7 +28,8 @@ body {
   padding: 10px;
   background-color: lightgrey;
 }
-#send-message {
+#send-message,
+#user-name {
   width: 80%;
   overflow-y: scroll;
   padding: 5px 10px;
