@@ -3,8 +3,11 @@ const sendBtn = document.getElementById("send");
 const displayMessages = document.getElementById("display-messages");
 const username = document.getElementById("user-name");
 
-const backendURL = "http://localhost:3000/messages";
-const ws = new WebSocket("ws://localhost:3000");
+const backendURL =
+  "https://fatmaevin-chat-app-websocket-backend.hosting.codeyourfuture.io/messages";
+const ws = new WebSocket(
+  "wss://fatmaevin-chat-app-websocket-backend.hosting.codeyourfuture.io"
+);
 
 function renderMessage(msg) {
   const p = document.createElement("p");
