@@ -4,6 +4,7 @@ body {
   align-items: center;
   height: 100vh;
   margin: 0;
+  background-color: lightsalmon;
 }
 
 .message-box {
@@ -20,6 +21,7 @@ body {
   flex: 1;
   padding: 10px;
   overflow-y: auto;
+  position: relative;
 }
 #bottom-container {
   border-top: 1px solid black;
@@ -44,4 +46,10 @@ body {
 #send:hover {
   background-color: lightpink;
   color: white;
+}
+#title-div{
+  color: purple;
+  position: absolute;
+  top:0;
+  
 }
