@@ -4,7 +4,7 @@ const http = require("http");
 const { server: WebSocketServer } = require("websocket");
 const crypto = require("crypto");
 
-const app = express(); 
+const app = express();
 const port = 3000;
 
 app.use(cors());
@@ -17,6 +17,10 @@ const wsServer = new WebSocketServer({ httpServer: server });
 const clients = [];
 const messages = [];
 const waitingResponse = [];
+
+app.get("/", (req, res) => {
+  res.send("server is running");
+});
 
 // ---------- WebSocket ----------
 wsServer.on("request", (request) => {
