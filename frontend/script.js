@@ -4,11 +4,12 @@ const displayMessages = document.getElementById("display-messages");
 const username = document.getElementById("user-name");
 
 const backendURL =
-  "https://fatmaevin-chat-app-backend.hosting.codeyourfuture.io/messages";
+  "https://fatmaevin-chat-app-websocket-backend.hosting.codeyourfuture.io/messages";
 
 const state = {
   messages: [],
 };
+let pollingActive = true;
 
 function renderMessages() {
   displayMessages.innerHTML = "";
@@ -20,6 +21,7 @@ function renderMessages() {
 }
 
 async function startLongPolling() {
+  if (!pollingActive) return;
   try {
     let lastMessage;
     if (state.messages.length > 0) {
@@ -43,7 +45,7 @@ async function startLongPolling() {
   } catch (error) {
     console.error("Error fetching messages:", error);
   }
-  startLongPolling();
+  if (pollingActive) startLongPolling();
 }
 
 async function sendMessage() {
@@ -72,5 +74,9 @@ async function sendMessage() {
     }
   });
 }
+window.addEventListener("beforeunload", () => {
+  pollingActive = false;
+  console.log("Polling stopped");
+});
 startLongPolling();
 sendMessage();
