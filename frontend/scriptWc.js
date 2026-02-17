@@ -8,19 +8,10 @@ const backendURL =
 const ws = new WebSocket(
   "wss://fatmaevin-chat-app-websocket-backend.hosting.codeyourfuture.io"
 );
-async function loadOldMessages() {
-  try {
-    const response = await fetch(backendURL);
-    if (!response.ok) throw new Error("Failed to fetch old messages");
-    const oldMessages = await response.json();
-    oldMessages.forEach(renderMessage);
-  } catch (err) {
-    console.error(err);
-  }
-}
+
 ws.onopen = () => {
   console.log("WebSocket connection opened");
-  loadOldMessages(); 
+  ws.send(JSON.stringify({ action: "get-old-messages" }));
 };
 
 function renderMessage(msg) {
@@ -44,7 +35,9 @@ function renderMessage(msg) {
 ws.onmessage = (event) => {
   const data = JSON.parse(event.data);
 
-  if (data.action === "update-react") {
+  if (data.action === "old-messages") {
+    data.messages.forEach(renderMessage);
+  } else if (data.action === "update-react") {
     const msgEl = document.getElementById(data.id);
     if (msgEl) {
       msgEl.querySelector(".likes").textContent = data.likes;
@@ -55,20 +48,22 @@ ws.onmessage = (event) => {
   }
 };
 
-sendBtn.addEventListener("click", async () => {
+sendBtn.addEventListener("click", () => {
   const text = messageInput.value.trim();
   const user = username.value.trim();
   if (!text || !user) return;
 
-  await fetch(backendURL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text, username: user }),
-  });
+  ws.send(
+    JSON.stringify({
+      action: "new-message",
+      text,
+      username: user,
+    })
+  );
 
   messageInput.value = "";
-  username.value = "";
 });
+
 window.addEventListener("beforeunload", () => {
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.close();

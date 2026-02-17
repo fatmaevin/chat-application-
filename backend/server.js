@@ -30,9 +30,46 @@ wsServer.on("request", (request) => {
 
   connection.on("message", (message) => {
     const data = JSON.parse(message.utf8Data);
+    if (data.action === "get-old-messages") {
+      connection.sendUTF(
+        JSON.stringify({
+          action: "old-messages",
+          messages: messages,
+        })
+      );
+    }
+
+    //  NEW MESSAGE
+    if (data.action === "new-message") {
+      if (!data.text || !data.username) return;
+
+      const newMessage = {
+        id: crypto.randomUUID(),
+        text: data.text,
+        username: data.username,
+        timestamp: Date.now(),
+        likes: 0,
+        dislikes: 0,
+      };
+
+      messages.push(newMessage);
+
+      // all clients
+      clients.forEach((c) => {
+        c.sendUTF(
+          JSON.stringify({
+            action: "new-message",
+            ...newMessage,
+          })
+        );
+      });
+    }
+
+    // 🔹 REACTION
     if (data.action === "react") {
       const msg = messages.find((m) => m.id === data.id);
       if (!msg) return;
+
       if (data.type === "like") msg.likes += 1;
       if (data.type === "dislike") msg.dislikes += 1;
 
